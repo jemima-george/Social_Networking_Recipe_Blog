@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewitched Recipes</title>
+    <link rel="stylesheet" href="/css/mystyle.css">
+</head>
+
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav>
+            <img src="/images/logo.png">
+            <a href="#" id="indexLink" data-section="indexPage"><h1>Bewitched Recipes</h1></a>
+            <div class="search-bar">
+                <input type="text" id="searchBar" placeholder="  Search ...">
+                <button onclick="searchAll()" id="searchButton">Search</button>
+                <!-- Display Search Results -->
+                <div id="userSearchResults" style="display: none;">
+                    <h3>Search Results</h3>
+                    <ul id="searchResultsList"></ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+            <!-- The href="#" attribute in an <a> (anchor) tag creates a clickable link that, by default, doesn't navigate anywhere significant 
+                 # as a Placeholder -->
+
+    <!-- Left-Side Pane -->
+    <div class="sidebar">
+        <a href="#" id="homeLink" data-section="indexPage" >Home</a>
+        <a href="#" id="recipecardLink">Post A Recipe</a>
+        <a href="#" id="followLink" data-section="followForm">Follow A User</a>
+        <a href="#" id="loginLink" data-section="loginForm">Login</a>
+        <a href="#" id="registerLink" data-section="registerForm">Register</a>
+    </div>
+
+    <div class="container">
+        <!-- Index page layout -->
+        <div class="indexpage active" id="indexPage" style="display: none;">
+            <div class="text-content">
+                <h2>Pure magic in every bite!</h2>
+                <p><b>
+                    Discover irresistible recipes that cast a spell on your taste buds.<br><br>
+                    Register to share your enchanting recipes!</b></p>
+                <button id="indexRegisterButton" type="submit" class="register-button"><b>Register</b></button>
+            </div>
+            <img src="/images/food5.jpg" alt="Delicious food" />
+        </div>
+        
+        <!-- Recipes List -->
+        <div id="recipesList" class="recipes-container"></div>
+
+        <!-- Login Form -->
+        <div class="auth-forms" id="loginForm">
+            <h2>Login</h2>
+            <form>
+                <label for="Email">Email</label><br>
+			    <input type="email" ; id="lemail" ; size="20" ;minlength="3" ; maxlength="320" ; placeholder="Enter Email" ;
+				name="Email" required><br>
+                <label for="psw">Password</label><br>
+			    <input type="password" ; id="lpass" ; size="20"; minlength="6" ; maxlength="32" ;
+				placeholder="Enter Password" name="psw" required><br>
+                <button type="submit" class="auth-button"><b>Login</b></button>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="auth-forms" id="registerForm">
+            <h2>Register</h2>
+            <form>
+                <label for="Name">Name :</label><br>
+				<input type="text"; id = "rname"; size="10"; minlength="3"; maxlength="32"; placeholder="Enter Name" name="Name" required><br>
+				
+				<label for="Email">Email :</label><br>
+				<input type="email"; id = "remail"; size="10"; minlength="3"; maxlength="320"; placeholder="Enter Email" name="Email" required><br>
+
+				<label for="psw">Password :</label> <br>
+				<input type="password"; id="rpass"; size="10"; minlength="6"; maxlength="32"; placeholder="Enter Password" name="psw" required><br>
+
+				<label for="phone">Phone Number :</label> <br>
+				<input type="tel"; id="rnum"; size="10"; maxlength="12"; name="phone" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" ><br>
+
+                <button type="submit" class="auth-button"><b>Register</b></button>
+            </form>
+            <div id="error-message" style="display: none;"></div>
+            <div id="success-message" style="display: none;"></div>
+        </div>
+
+        <!-- Recipe Form -->
+        <div class="recipe-form" id="recipeForm" style="display: none;"><br>
+            <h2>Share a New Recipe:</h2>
+            <form>
+                <label for="title">Recipe Title:</label><br>
+                <input type="text" id="title" name="title" required><br><br>
+                <label for="ingredients">Ingredients:</label><br>
+                <textarea id="ingredients" name="ingredients" rows="3" required></textarea><br><br>
+                <label for="instructions">Instructions:</label><br>
+                <textarea id="instructions" name="instructions" rows="4" required></textarea><br><br>
+                <button type="submit" class="add-recipe-button"><b>Submit</b></button>
+            </form>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-section" id="profilePage" style="display: none;">
+            <h2>Welcome, <span id="profileName"></span>!</h2>
+            <p><b>Here is your profile information:</b></p>
+            <p>Email: <span id="profileUserEmail"></span></p>
+            <p>Followers: <span id="profileFollowers">0</span></p>
+            <p>Posts: <span id="profilePosts">0</span></p>
+            <button id="logoutButton" class="logout-button"><b>Logout</b></button>
+        </div>
+
+        <!-- Follow A User Form -->
+        <div class="follow-form" id="followForm">
+            <h2>Follow a User</h2><br>
+            <form id="follow-user-form">
+                <label for="Username">Send A Follow Request :</label><br><br>
+                <input type="text" id="usernameToFollow" placeholder="Enter Username" required /><br>
+                <button type="submit"><b>Follow</b></button>
+            </form>
+        </div>  
+    </div>
+
+    <script type="module" src="/js/shared_funcs.js"></script>
+    <script type="module" src="/js/authentication.js"></script>
+    <script type="module" src="/js/navigation.js"></script>
+    <script src="/js/recipes.js"></script>  
+    <script type="module" src="/backend/ajax.js"></script>
+
+    <script>
+        // Search for recipes and users in MongoDb
+        function searchAll() {
+            const query = document.getElementById('searchBar').value.trim();
+            const searchResultsList = document.getElementById('searchResultsList'); // Get the search results list
+            const userSearchResults = document.getElementById('userSearchResults'); // Get the search results container
+            
+            if (!query) {
+                alert("Please enter a search query.");
+                return;
+            }
+
+            // Clear previous results
+            searchResultsList.innerHTML = ""; 
+
+            // Fetch users and recipes in parallel
+            const userSearch = fetch(`http://localhost:8080/users/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error("Error searching users:", error);
+                    return { success: false, users: [] }; // Fallback to avoid breaking
+                });
+
+            const contentSearch = fetch(`http://localhost:8080/contents/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error("Error searching contents:", error);
+                    return { success: false, contents: [] }; // Fallback to avoid breaking
+                });
+
+            // Combine and display results
+            Promise.all([userSearch, contentSearch])
+                .then(([userData, contentData]) => {
+                    // Handle user results
+                    if (userData.success && userData.users.length > 0) {
+                        const userHeader = document.createElement("li");
+                        userHeader.innerHTML = "<strong>Users:</strong>";
+                        searchResultsList.appendChild(userHeader);
+
+                        userData.users.forEach(user => {
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = `
+                                <span>${user.name} (${user.email})</span>
+                                <button class="follow-button" data-username="${user.name}">Follow</button>
+                            `;
+                            searchResultsList.appendChild(listItem);
+                        });
+                    } else {
+                        const noUserResult = document.createElement("li");
+                        noUserResult.className = "no-results"; 
+                        noUserResult.innerHTML = "<em>No users found</em>";
+                        searchResultsList.appendChild(noUserResult);
+                    }
+
+                    // Handle content (recipe) results
+                    if (contentData.success && contentData.contents.length > 0) {
+                        const contentHeader = document.createElement("li");
+                        contentHeader.innerHTML = "<strong>Recipes:</strong>";
+                        searchResultsList.appendChild(contentHeader);
+
+                        contentData.contents.forEach(recipe => {
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = `
+                                <h4>${recipe.title}</h4>
+                                <p><strong>Author:</strong> ${recipe.author}</p>`;
+                            searchResultsList.appendChild(listItem);
+                        });
+                    } else {
+                        const noContentResult = document.createElement("li");
+                        noContentResult.className = "no-results"; 
+                        noContentResult.innerHTML = "<em>No recipes found</em>";
+                        searchResultsList.appendChild(noContentResult);
+                    }
+
+                    // Show the search results container
+                    userSearchResults.style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error combining search results:", error);
+                    alert("An error occurred while searching. Please try again.");
+                });
+        }
+    </script>
+    
+
+</body>
+</html>
+    
